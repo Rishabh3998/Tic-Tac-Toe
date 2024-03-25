@@ -5,14 +5,23 @@ interface IPlayer {
   playerName: string;
   playerSymbol: string;
   isActive: boolean;
+  handlePlayerName: (symbol: string, newName: string) => void;
 }
 
-const Player = ({ playerName, playerSymbol, isActive }: IPlayer) => {
+const Player = ({
+  playerName,
+  playerSymbol,
+  isActive,
+  handlePlayerName,
+}: IPlayer) => {
   const [isEdit, setIsEdit] = useState(false);
-  const [playerNames, setPlayerNames] = useState("");
+  const [playerNames, setPlayerNames] = useState(playerName);
 
   const handleEdit = () => {
     setIsEdit((prev) => !prev);
+    if (isEdit) {
+      handlePlayerName(playerSymbol, playerNames);
+    }
   };
 
   const handleChange = (e: any) => {
