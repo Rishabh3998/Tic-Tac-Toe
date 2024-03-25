@@ -3,6 +3,8 @@ import GameBoard from "./components/GameBoard";
 import Player from "./components/Player";
 import "./App.css";
 import Log from "./components/Log";
+import { initialGameBoard, WINNING_COMBINATIONS } from "./data";
+import GameOver from "./components/GameOver";
 
 const derivedActivePlayer = (
   gameTurns: Array<{ square: { row: number; col: number }; player: string }>
@@ -23,18 +25,51 @@ const App = () => {
 
   const activePlayer = derivedActivePlayer(gameTurns);
 
+  const gameBoard = initialGameBoard;
+
+  for (const turn of gameTurns) {
+    const { square, player } = turn;
+    const { row, col } = square;
+    gameBoard[row][col] = player;
+  }
+
+  let winner;
+
+  for (const combination of WINNING_COMBINATIONS) {
+    const firstSquareSymbol =
+      gameBoard[combination[0].row][combination[0].column];
+    const secondSquareSymbol =
+      gameBoard[combination[1].row][combination[1].column];
+    const thirdSquareSymbol =
+      gameBoard[combination[2].row][combination[2].column];
+
+    if (
+      firstSquareSymbol &&
+      firstSquareSymbol === secondSquareSymbol &&
+      firstSquareSymbol === thirdSquareSymbol
+    ) {
+      winner = firstSquareSymbol;
+    }
+  }
+
   const handleSelectPlayer = (rowIndex: number, colIndex: number) => {
-    setGameTurns((prevTurns) => {
-      const currentPlayer = derivedActivePlayer(prevTurns);
-      const updatedTurns = [
-        { square: { row: rowIndex, col: colIndex }, player: currentPlayer },
-        ...prevTurns,
-      ];
-      return updatedTurns;
-    });
+    const isFilled = gameTurns.findIndex(
+      (turn) => turn.square.row == rowIndex && turn.square.col == colIndex
+    );
+    if (isFilled === -1) {
+      setGameTurns((prevTurns) => {
+        const currentPlayer = derivedActivePlayer(prevTurns);
+        const updatedTurns = [
+          { square: { row: rowIndex, col: colIndex }, player: currentPlayer },
+          ...prevTurns,
+        ];
+        return updatedTurns;
+      });
+    }
   };
 
-  console.log({ gameTurns });
+  const hasDraw = gameTurns.length == 9 && !winner;
+
   return (
     <>
       <main>
@@ -51,7 +86,8 @@ const App = () => {
               isActive={activePlayer === "O"}
             />
           </ol>
-          <GameBoard onSelectSquare={handleSelectPlayer} turns={gameTurns} />
+          {(winner || hasDraw) && <GameOver winner={winner as string} />}
+          <GameBoard onSelectSquare={handleSelectPlayer} board={gameBoard} />
         </div>
         <Log gameTurns={gameTurns} />
       </main>

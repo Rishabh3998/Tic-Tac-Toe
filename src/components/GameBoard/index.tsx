@@ -1,29 +1,15 @@
-interface IGameBoard extends Array<Array<string | null>> {}
-
-const initialGameBoard: IGameBoard = [
-  [null, null, null],
-  [null, null, null],
-  [null, null, null],
-];
+import { IGameBoard } from "../../data";
 
 const GameBoard = ({
   onSelectSquare,
-  turns,
+  board,
 }: {
   onSelectSquare: (rowIndex: number, colIndex: number) => void;
-  turns: Array<{ square: { row: number; col: number }; player: string }>;
+  board: IGameBoard;
 }) => {
-  const gameBoard = initialGameBoard;
-
-  for (const turn of turns) {
-    const { square, player } = turn;
-    const { row, col } = square;
-    gameBoard[row][col] = player;
-  }
-
   return (
     <ol id="game-board">
-      {gameBoard?.map((row, rowIndex: number) => (
+      {board?.map((row, rowIndex: number) => (
         <li key={rowIndex}>
           <ol>
             {row?.map((col, colIndex: number) => (
