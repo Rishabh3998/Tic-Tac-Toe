@@ -4,22 +4,28 @@ import Player from "./components/Player";
 import "./App.css";
 import Log from "./components/Log";
 
-function App() {
-  const [activePlayer, setActivePlayer] = useState("X");
+const derivedActivePlayer = (
+  gameTurns: Array<{ square: { row: number; col: number }; player: string }>
+) => {
+  let currentPlayer = "X";
+  if (gameTurns.length > 0 && gameTurns[0].player === "X") {
+    currentPlayer = "O";
+  } else {
+    currentPlayer = "X";
+  }
+  return currentPlayer;
+};
+
+const App = () => {
   const [gameTurns, setGameTurns] = useState<
     Array<{ square: { row: number; col: number }; player: string }>
   >([]);
+
+  const activePlayer = derivedActivePlayer(gameTurns);
+
   const handleSelectPlayer = (rowIndex: number, colIndex: number) => {
-    setActivePlayer((prev) => {
-      return prev === "X" ? "O" : "X";
-    });
     setGameTurns((prevTurns) => {
-      let currentPlayer = "X";
-      if (prevTurns.length > 0 && prevTurns[0].player === "X") {
-        currentPlayer = "O";
-      } else {
-        currentPlayer = "X";
-      }
+      const currentPlayer = derivedActivePlayer(prevTurns);
       const updatedTurns = [
         { square: { row: rowIndex, col: colIndex }, player: currentPlayer },
         ...prevTurns,
@@ -51,6 +57,6 @@ function App() {
       </main>
     </>
   );
-}
+};
 
 export default App;
